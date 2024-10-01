@@ -29,7 +29,8 @@ def download_data(data_file_path = '', data_file_name = '',
     mtx = mtx_rawcounts.tocsr()[cells, :]
     del mtx_rawcounts
 
-    genes_names = np.array(adata_raw.var.index)
+    adata_raw.var['gene_name'] = np.array(adata_raw.var.index)
+    genes_names = adata_raw.var.gene_name.values
 
     # ---------------------------------------------------FILTRO CELLULE----------------------------------------------------
     
