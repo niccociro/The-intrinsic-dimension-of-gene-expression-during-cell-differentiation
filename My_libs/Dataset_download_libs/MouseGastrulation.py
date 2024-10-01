@@ -9,13 +9,14 @@ import scanpy
 
 
 
-def download_data(data_file_folder = '', verbose = True):
+def download_data(data_file_path = '', data_file_name = '', 
+                  verbose = True):
     
     print("Welcome to MOUSE GASTRULATION dataset!")
 
     # path = 'Data/'
     # adata_raw=scanpy.read_h5ad(path + 'mouse_gastrulation.h5ad')
-    adata_raw=scanpy.read_h5ad(data_file_folder + 'mouse_gastrulation.h5ad')
+    adata_raw=scanpy.read_h5ad(data_file_path + data_file_name)
 
     mtx_rawcounts = adata_raw.X
     df_meta = adata_raw.obs
@@ -48,7 +49,7 @@ def download_data(data_file_folder = '', verbose = True):
         print("In order to follow the quality control of the paper:")
         print(f" - cells with less than {min_occurrence} expressed genes were deleted. {N_sparse_cells} deleted ({N_zeros_cells} full of zeros)")
     
-    MT_ratios = MT_fraction(mtx, genes_names, data_file_folder)
+    MT_ratios = MT_fraction(mtx, genes_names, data_file_path)
     max_fraction = 0.0237
     cells_cond2 = MT_ratios < max_fraction
     if(verbose):    print(f" - cells with mitochondrial gene-expression fractions greater than {100*max_fraction}% were deleted. {np.sum(cells_cond2==False)} deleted")
@@ -64,7 +65,7 @@ def download_data(data_file_folder = '', verbose = True):
     
     if(verbose): print("\nGenes selection...")
 
-    protCoding_genes = get_protCoding_genes(data_file_folder, genes_names)
+    protCoding_genes = get_protCoding_genes(data_file_path, genes_names)
     genes_cond1 = protCoding_genes
     if(verbose): print(f"Selecting {np.sum(protCoding_genes)} protein-coding genes")
 
@@ -151,8 +152,8 @@ def pos_repetead_genes(mtx, gene_names):
 
 
 
-def get_protCoding_genes(data_file_folder, genes_names):
-    protCoding_filename = data_file_folder + "PC_mmusculus_gene_ensembl.csv"
+def get_protCoding_genes(data_file_path, genes_names):
+    protCoding_filename = data_file_path + "PC_mmusculus_gene_ensembl.csv"
 
     ProtCoding_df = pd.read_csv(protCoding_filename)
     ProtCoding_names = ProtCoding_df.external_gene_name.values
@@ -271,8 +272,8 @@ def clean_df_meta(df_meta, verbose):
 
 
 
-def MT_fraction(mtx, genes_name, data_file_folder):
-    filename = data_file_folder + "MT_mmusculus_gene_ensembl.txt"
+def MT_fraction(mtx, genes_name, data_file_path):
+    filename = data_file_path + "MT_mmusculus_gene_ensembl.txt"
     df = pd.read_csv(filename)
     MT_genes = np.unique(np.array(df["Gene name"].values))
 

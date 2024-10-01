@@ -10,14 +10,14 @@ import ast
 
 
 
-def download_data(data_file_folder = '', verbose = True):
+def download_data(data_file_path = '', data_file_name = '', 
+                  verbose = True):
     
     print("Welcome to HYDRA dataset!")
 
-    adata_raw=scanpy.read_h5ad(data_file_folder+'hydra_transcriptome.h5ad')
+    adata_raw=scanpy.read_h5ad(data_file_path + data_file_name)
 
     df_meta = adata_raw.obs
-    df_meta = df_meta.rename(columns={'Cluster': 'celltype'})
     mtx = adata_raw.X
     df_meta['cell'] = np.arange(0, len(df_meta), 1)
 

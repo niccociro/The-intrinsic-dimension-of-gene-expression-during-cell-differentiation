@@ -9,11 +9,12 @@ import scanpy
 
 
 
-def download_data(data_file_folder = '', verbose = True):
+def download_data(data_file_path = '', data_file_name = '', 
+                  verbose = True):
 
     print("Welcome to ZEBRAFISH RAJ dataset!")
 
-    adata_raw=scanpy.read(data_file_folder + 'data.h5ad')
+    adata_raw=scanpy.read(data_file_path + data_file_name)
 
     df_meta = adata_raw.obs
     mtx_rawcounts = adata_raw.X
@@ -38,7 +39,7 @@ def download_data(data_file_folder = '', verbose = True):
     
     if(verbose): print("\nGenes selection...")
 
-    protCoding_genes = get_protCoding_genes(data_file_folder, genes_names)
+    protCoding_genes = get_protCoding_genes(data_file_path, genes_names)
     genes_cond1 = protCoding_genes
     if(verbose): print(f"Selecting {np.sum(protCoding_genes)} protein-coding genes")
 
@@ -91,8 +92,8 @@ def prepare_data(df_meta, mtx_rawcounts, genes_name,
 
 
 
-def get_protCoding_genes(data_file_folder, genes_names):
-    protCoding_filename = data_file_folder + "PC_drerio_gene_ensembl.csv"
+def get_protCoding_genes(data_file_path, genes_names):
+    protCoding_filename = data_file_path + "PC_drerio_gene_ensembl.csv"
 
     ProtCoding_df = pd.read_csv(protCoding_filename)
     ProtCoding_names = ProtCoding_df.ensembl_gene_id.values.astype(str)

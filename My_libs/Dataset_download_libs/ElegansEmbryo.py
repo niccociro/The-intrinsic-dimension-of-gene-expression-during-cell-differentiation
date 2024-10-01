@@ -9,16 +9,16 @@ import scanpy
 
 
 
-def download_data(data_file_folder = '', verbose = True):
+def download_data(data_file_path = '', data_file_name = '', 
+                  verbose = True):
     
     print("Welcome to ELEGANS EMBRYOGENESIS dataset!")
 
-    adata_raw=scanpy.read_h5ad(data_file_folder + 'elegans_meta.h5ad')
+    adata_raw=scanpy.read_h5ad(data_file_path + data_file_name)
 
     mtx_rawcounts = adata_raw.X
     df_meta = adata_raw.obs
 
-    df_meta = df_meta.rename(columns={'embryo.time.bin': 'stage'})
     df_meta['stage'] = df_meta['stage'].values.astype(str)
     df_meta['cell'] = np.arange(0, len(df_meta), 1)
     cells = df_meta.cell.values
@@ -49,7 +49,7 @@ def download_data(data_file_folder = '', verbose = True):
     
     if(verbose): print("\nGenes selection...")
 
-    protCoding_genes = get_protCoding_genes(data_file_folder, genes_names)
+    protCoding_genes = get_protCoding_genes(data_file_path, genes_names)
     genes_cond1 = protCoding_genes
     if(verbose): print(f"Selecting {np.sum(protCoding_genes)} protein-coding genes")
 
@@ -105,8 +105,8 @@ def prepare_data(df_meta, mtx_rawcounts, genes_name,
 
 
 
-def get_protCoding_genes(data_file_folder, genes_names):
-    protCoding_filename = data_file_folder + "PC_celegans_gene_ensembl.csv"
+def get_protCoding_genes(data_file_path, genes_names):
+    protCoding_filename = data_file_path + "PC_celegans_gene_ensembl.csv"
 
     ProtCoding_df = pd.read_csv(protCoding_filename)
     ProtCoding_names = ProtCoding_df.external_gene_name.values
