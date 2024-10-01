@@ -1,0 +1,7 @@
+ipython
+numpy
+scipy
+scanpy
+matplotlib
+dadapy
+biopython
