@@ -36,7 +36,6 @@ def download_data(data_file_path = '', data_file_name = '',
     
     if(verbose): print("\nQuality control on cells...")
 
-    N_zeros_cells = np.sum(mtx.getnnz(1) == 0)
     min_occurrence = 1200
     N_sparse_cells = np.sum(mtx.getnnz(1) < min_occurrence)
     cells_cond1 = mtx.getnnz(1) > min_occurrence
