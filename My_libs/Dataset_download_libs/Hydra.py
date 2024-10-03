@@ -24,7 +24,7 @@ def download_data(data_file_path = '', data_file_name = '',
     if(verbose):
         print(f"scRNA-seq data in a counts matrix cells x genes with shape ({mtx.shape})")
         print("Gene names stored in adata.var")
-        print(f"Metadata about cells stored in adata.obs ({df_meta.obs.columns})")
+        print(f"Metadata about cells stored in adata.obs ({df_meta.columns})")
 
     genes_names = adata_raw.var.gene_name.values
 

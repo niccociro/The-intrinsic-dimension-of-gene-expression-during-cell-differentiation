@@ -32,7 +32,7 @@ def download_data(data_file_path = '', data_file_name = '',
     if(verbose):
         print(f"scRNA-seq data in a counts matrix cells x genes with shape ({mtx_rawcounts.shape})")
         print("Gene names stored in adata.var")
-        print(f"Metadata about cells stored in adata.obs ({df_meta.obs.columns})")
+        print(f"Metadata about cells stored in adata.obs ({df_meta.columns})")
 
     mtx = mtx_rawcounts.tocsr()[cells, :]
     del mtx_rawcounts
@@ -47,7 +47,7 @@ def download_data(data_file_path = '', data_file_name = '',
     cells_cond1 = mtx.getnnz(1) > min_occurrence
     if(verbose):    
         print("In order to follow the quality control of the paper:")
-        print(f" - cells with less than {min_occurrence} expressed genes were deleted ({N_sparse_cells}) deleted")
+        print(f" - cells with less than {min_occurrence} expressed genes were deleted ({N_sparse_cells})")
     
     MT_ratios = df.percent_mito.values.astype(dtype=np.float32)
     max_fraction = 0.075
