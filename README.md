@@ -1,5 +1,5 @@
 # The-intrinsic-dimension-of-gene-expression-during-cell-differentiation
-In thi repository, we supply four notebooks for the reproduction of some of the results exposed in the paper "The intrinsic dimension of gene expression during cell differentiation".
+In this repository, we supply four notebooks for the reproduction of some of the results exposed in the paper "The intrinsic dimension of gene expression during cell differentiation".
 
 We reproduce the steps of our analysis, from the raw data stored in an AnnData object *adata* to the plot of the intrinsic dimension (ID) trend.
 
