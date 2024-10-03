@@ -30,29 +30,29 @@ def download_data(data_file_path = '', data_file_name = '',
     cells = df_meta.cell.values
 
     if(verbose):
-        print(f"Metadata in a dataframe with shape ({len(df_meta)}, {len(df_meta.columns)})")
-        print(f"scRNA-seq data in a counts matrix with shape ({mtx_rawcounts.shape})")
+        print(f"scRNA-seq data in a counts matrix cells x genes with shape ({mtx_rawcounts.shape})")
+        print("Gene names stored in adata.var")
+        print(f"Metadata about cells stored in adata.obs ({df_meta.obs.columns})")
 
     mtx = mtx_rawcounts.tocsr()[cells, :]
     del mtx_rawcounts
 
-    genes_names = np.array(adata_raw.var.index)
+    genes_names = adata_raw.var.gene_name.values
 
-    # --------------------------------------------FILTRO CELLULE-----------------------------------------
+    # --------------------------------------------Filter on cells-----------------------------------------
     if(verbose): print("\nQuality control on cells...")
 
-    N_zeros_cells = np.sum(mtx.getnnz(1) == 0)
     min_occurrence = 500
     N_sparse_cells = np.sum(mtx.getnnz(1) < min_occurrence)
     cells_cond1 = mtx.getnnz(1) > min_occurrence
     if(verbose):    
         print("In order to follow the quality control of the paper:")
-        print(f" - cells with less than {min_occurrence} expressed genes were deleted. {N_sparse_cells} deleted ({N_zeros_cells} full of zeros)")
+        print(f" - cells with less than {min_occurrence} expressed genes were deleted ({N_sparse_cells}) deleted")
     
     MT_ratios = df.percent_mito.values.astype(dtype=np.float32)
     max_fraction = 0.075
     cells_cond2 = MT_ratios < max_fraction
-    if(verbose):    print(f" - cells with mitochondrial gene-expression fractions greater than {100*max_fraction}% ({np.sum(cells_cond2==False)}) were deleted")
+    if(verbose):    print(f" - cells with mitochondrial gene-expression fractions greater than {100*max_fraction}% were deleted ({np.sum(cells_cond2==False)})")
 
     cells_cond = (cells_cond1 & cells_cond2)
     
@@ -61,7 +61,7 @@ def download_data(data_file_path = '', data_file_name = '',
     mtx = mtx[cells_cond, :]
     df = df[cells_cond]
    
-    # ---------------------------------------------FILTRO GENI-------------------------------------------
+    # ---------------------------------------------Filter on genes-------------------------------------------
     
     if(verbose): print("\nGenes selection...")
 
@@ -70,7 +70,7 @@ def download_data(data_file_path = '', data_file_name = '',
     if(verbose): print(f"Selecting {np.sum(protCoding_genes)} protein-coding genes")
 
     genes_cond2 = mtx.getnnz(0) > 0
-    if(verbose): print("Deleting genes because full of zeros")
+    if(verbose): print("Deleting genes full of zeros")
 
     genes_cond = (genes_cond1 & genes_cond2)
 
@@ -90,9 +90,8 @@ def download_data(data_file_path = '', data_file_name = '',
     df.insert(0, 'cell', np.arange(0, len(df), 1))
 
     if(verbose): 
-        print(f"\nscRNA-seq data in csr matrix with shape ({mtx.shape})")
-        print(f"Metadata in a dataframe with columns {list(df_meta.columns)}")
-
+        print(f"\nAfter the filtering procedure, scRNA-seq data have shape ({mtx.shape})")
+    
     return mtx, df, genes_names
 
 
@@ -107,7 +106,7 @@ def prepare_data(df_meta, mtx_rawcounts, genes_name,
 
     mtx = mtx_rawcounts[cells, :]
 
-    if(verbose): print(f"Sub-sampled data in a csr matrix with shape ({mtx.shape})")
+    if(verbose): print(f"Sub-sampled data in a matrix with shape ({mtx.shape})")
 
     del df['cell']
     df.insert(0, 'cell', np.arange(0, len(df), 1))

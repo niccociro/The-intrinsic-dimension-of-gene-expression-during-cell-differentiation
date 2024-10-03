@@ -23,19 +23,20 @@ def download_data(data_file_path = '', data_file_name = '',
     cells = df_meta.cell.values
 
     if(verbose):
-        print(f"Metadata in a dataframe with shape ({len(df_meta)}, {len(df_meta.columns)})")
-        print(f"scRNA-seq data in a counts matrix with shape ({mtx_rawcounts.shape})")
+        print(f"scRNA-seq data in a counts matrix cells x genes with shape ({mtx_rawcounts.shape})")
+        print("Gene names stored in adata.var")
+        print(f"Metadata about cells stored in adata.obs ({df_meta.obs.columns})")
 
     mtx = mtx_rawcounts.tocsr()[cells, :]
     del mtx_rawcounts
 
-    genes_names = np.array(adata_raw.var.gene_id.values)
+    genes_names = adata_raw.var.gene_name.values
 
-    # -------------------------------------------FILTRO CELLULE-------------------------------------------
+    # -------------------------------------------Filter on cells-------------------------------------------
     
     if(verbose): print("\nQuality control on cells...")
 
-    # --------------------------------------------------FILTRO GENI----------------------------------------------
+    # --------------------------------------------------Filter on genes----------------------------------------------
     
     if(verbose): print("\nGenes selection...")
 
@@ -44,7 +45,7 @@ def download_data(data_file_path = '', data_file_name = '',
     if(verbose): print(f"Selecting {np.sum(protCoding_genes)} protein-coding genes")
 
     genes_cond2 = mtx.getnnz(0) > 0
-    if(verbose): print("Deleting genes because full of zeros")
+    if(verbose): print("Deleting genes full of zeros")
 
     genes_cond = (genes_cond1 & genes_cond2)
 
@@ -64,9 +65,8 @@ def download_data(data_file_path = '', data_file_name = '',
     df_meta.insert(0, 'cell', np.arange(0, len(df_meta), 1))
 
     if(verbose): 
-        print(f"\nscRNA-seq data in csr matrix with shape ({mtx.shape})")
-        print(f"Metadata in a dataframe with columns {list(df_meta.columns)}")
-
+        print(f"\nAfter the filtering procedure, scRNA-seq data have shape ({mtx.shape})")
+    
     return mtx, df_meta, genes_names
 
 
@@ -80,7 +80,7 @@ def prepare_data(df_meta, mtx_rawcounts, genes_name,
 
     mtx = mtx_rawcounts[cells, :]
 
-    if(verbose): print(f"Sub-sampled data in a csr matrix with shape ({mtx.shape})")
+    if(verbose): print(f"Sub-sampled data in a matrix with shape ({mtx.shape})")
 
     del df['cell']
     df.insert(0, 'cell', np.arange(0, len(df), 1))

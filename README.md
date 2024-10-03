@@ -16,4 +16,4 @@ In the folder 'Data' there are 6 files, produced by BioMart, a data mining tool 
 
 <span style="color: red;">**Warning**</span>
 In order to carry out our analyses, the original data must be formatted into an AnnData object, that contains both the counts matrix and the metadata in the way that has been previously explained. After that, this object must be stored in a *h5ad* file in the folder 'Data'. In the notebooks, we precisely specify the online repository that gives free access to every original dataset and explain what attribute of the metadata we take in consideration and how we renamed it (if necessary).
-In order to facilitate this preliminary step, it is possible to download the data already formatted in the correct way to be analyzed by our code from this [Google Drive repository](https://drive.google.com/drive/folders/1eVfpxwF8ak6aPn5-DuiwrIFP4iePupOe?usp=sharing).
+In order to facilitate this preliminary step, it is possible to download the data already formatted in the correct way to be analyzed by our code from this [Google Drive repository](https://drive.google.com/drive/folders/1bm69GFaq8lcXRjAtxbgQIi2j_H_cX6bi?usp=drive_link).

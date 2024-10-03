@@ -22,12 +22,13 @@ def download_data(data_file_path = '', data_file_name = '',
     df_meta['cell'] = np.arange(0, len(df_meta), 1)
 
     if(verbose):
-        print(f"Metadata in a dataframe with shape ({len(df_meta)}, {len(df_meta.columns)})")
-        print(f"scRNA-seq data in a counts matrix with shape ({mtx.shape})")
+        print(f"scRNA-seq data in a counts matrix cells x genes with shape ({mtx.shape})")
+        print("Gene names stored in adata.var")
+        print(f"Metadata about cells stored in adata.obs ({df_meta.obs.columns})")
 
-    genes_names = np.array(adata_raw.var.index)
+    genes_names = adata_raw.var.gene_name.values
 
-    # -------------------------------------------------FILTRO CELLULE-------------------------------------------
+    # -------------------------------------------------Filter on cells-------------------------------------------
     
     if(verbose): print("\nQuality control on cells...")
 
@@ -37,18 +38,18 @@ def download_data(data_file_path = '', data_file_name = '',
     N_sparse_cells = np.sum(cells_cond1==False)
     if(verbose):    
         print("In order to follow the quality control of the paper:")
-        print(f" - cells with less than {min_occurrence}, or more than {max_occurrence} expressed genes were deleted ({N_sparse_cells}")
+        print(f" - cells with less than {min_occurrence}, or more than {max_occurrence} expressed genes were deleted ({N_sparse_cells})")
     
     cells_size = np.asarray(mtx.sum(axis=1)).flatten()
     min_size = 400
     max_size = 70000
     cells_cond2 = (cells_size > min_size) & (cells_size < max_size)
-    if(verbose):    print(f" - cells with size greater than {min_size} and smaller than {max_size}. {np.sum(cells_cond2==False)} deleted.")
+    if(verbose):    print(f" - cells with size greater than {min_size} and smaller than {max_size} were deleted ({np.sum(cells_cond2==False)})")
     
     MT_ratios = MT_fraction(mtx, genes_names)
     max_fraction = 0.05
     cells_cond3 = MT_ratios < max_fraction
-    if(verbose):    print(f" - cells with mitochondrial gene-expression fractions greater than {100*max_fraction}% ({np.sum(cells_cond3==False)}) were deleted")
+    if(verbose):    print(f" - cells with mitochondrial gene-expression fractions greater than {100*max_fraction}% were deleted ({np.sum(cells_cond3==False)})")
 
     cells_cond = (cells_cond1 & cells_cond2 & cells_cond3)
 
@@ -57,14 +58,14 @@ def download_data(data_file_path = '', data_file_name = '',
     mtx = mtx[cells_cond, :]
     df_meta = df_meta[cells_cond]
     
-    # --------------------------------------------------FILTRO GENI----------------------------------------------
+    # --------------------------------------------------Filter on genes----------------------------------------------
     
     if(verbose): print("\nGenes selection...")
 
     if(verbose): print(f"Cannot select protein-coding genes because they are not available for Hydra in Ensembl database")
 
     genes_cond = mtx.getnnz(0) > 0
-    if(verbose): print("Deleting genes because full of zeros")
+    if(verbose): print("Deleting genes full of zeros")
     
     # -------------------------------------------------------------------------------------------------------
     
@@ -82,8 +83,7 @@ def download_data(data_file_path = '', data_file_name = '',
     df_meta.insert(0, 'cell', np.arange(0, len(df_meta), 1))
 
     if(verbose): 
-        print(f"\nscRNA-seq data in csr matrix with shape ({mtx.shape})")
-        print(f"Metadata in a dataframe with columns {list(df_meta.columns)}")
+        print(f"\nAfter the filtering procedure, scRNA-seq data have shape ({mtx.shape})")
 
     return mtx, df_meta, genes_names
 
@@ -98,7 +98,7 @@ def prepare_data(df_meta, mtx, genes_name,
 
     mtx = mtx[cells, :]
 
-    if(verbose): print(f"Sub-sampled data in a csr matrix with shape ({mtx.shape})")
+    if(verbose): print(f"Sub-sampled data in a matrix with shape ({mtx.shape})")
 
     del df['cell']
     df.insert(0, 'cell', np.arange(0, len(df), 1))
@@ -150,14 +150,9 @@ def MT_fraction(mtx, genes_name):
         if any(conds):   MT_genes_position.append(ng)
     MT_genes_position = np.array(MT_genes_position)
 
-    # Convert the sparse matrix to a numpy array
     mtx0_array = mtx.toarray()
-
-    # Calculate the sum of each row in the matrix
     row_sums = np.sum(mtx0_array, axis=1)
 
-    # Calculate the sum of MT_genes for each cell and compute the MT_fraction
-    #print(MT_genes_position)
     cell_MT_fractions = np.sum(mtx0_array[:, MT_genes_position], axis=1) / row_sums
     
     return cell_MT_fractions
