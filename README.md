@@ -10,7 +10,7 @@ We reproduce the steps of our analysis, from the raw data stored in an AnnData o
     - the **temporal stage** from which each cell has been sampled (*stage* column), in case we want to study the ID trend in time (Panel 1-2).
     - the **cell-type** of each cell (*celltype* column), reconstructed by the authors of the corresponding paper, in case we want to study the ID per cell-type (Panel 3-4).
 
-In the folder 'Data' there are 6 files, produced by BioMart, a data mining tool that allows to export data from Ensembl database:
+In the folder 'Data' there are 6 files produced with BioMart, a data mining tool that allows to export data from Ensembl database:
 - 3 of them contain a list of the mitochondrial genes for 3 different species. Mitochondrial genes are typically needed to replicate the quality control on cells performed by the authors of the papers.
 - 3 of them contain a list of the protein-coding genes for 3 different species. Protein-coding genes are needed because it is our only features selection, as explained in the paper.
 
